@@ -1,13 +1,22 @@
-FROM openjdk:21-jdk-slim
+# FROM openjdk:21-jdk-slim - ~462MB
+ # ~350MB
+FROM eclipse-temurin:21-jdk-alpine
+
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Create the jar file
-RUN jar cf helloworld.jar Hello.java
+COPY app/Hello.java .
 
-# Copy the jar file into the container
-COPY app/*.jar helloworld.jar
+# Compile the code
+RUN javac Hello.java
+
+# Create the manifest file
+RUN mkdir META-INF
+COPY META-INF/* META-INF/
+
+# Package the jar file
+RUN jar cmvf META-INF/MANIFEST.MF hello.jar Hello.class
 
 # Run the Hello World
-CMD ["java", "-jar", "helloworld.jar"]
+CMD ["java", "-jar", "hello.jar"]
